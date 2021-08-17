@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
-public class CategoryControllerV1 {
+public class CategoryControllerV1Test {
 
     static String CATEGORY_V1 = "/v1/categories";
 
