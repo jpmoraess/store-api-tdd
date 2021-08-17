@@ -1,6 +1,7 @@
 package br.com.moraesit.storeapitdd.api.v1.controllers;
 
 import br.com.moraesit.storeapitdd.api.v1.dto.CategoryDTO;
+import br.com.moraesit.storeapitdd.api.v1.mapper.CategoryMapper;
 import br.com.moraesit.storeapitdd.domain.entities.Category;
 import br.com.moraesit.storeapitdd.domain.services.CategoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,14 +38,23 @@ public class CategoryControllerV1Test {
     @MockBean
     CategoryService categoryService;
 
+    @MockBean
+    CategoryMapper categoryMapper;
+
     @Test
     @DisplayName("must create a create category successfully")
     public void createCategoryTest() throws Exception {
-        var categoryDTO = categoryDTO("T-shirt", "Description");
+        var categoryDTO = categoryDTO(null, "T-shirt", "Description");
 
         var savedCategory = category(1L, "T-shirt", "Description");
 
+        BDDMockito.when(categoryMapper.toEntity(Mockito.any(CategoryDTO.class)))
+                .thenReturn(category(null, categoryDTO.getName(), categoryDTO.getDescription()));
+
         BDDMockito.given(categoryService.create(Mockito.any(Category.class))).willReturn(savedCategory);
+
+        BDDMockito.when(categoryMapper.toDTO(Mockito.any(Category.class)))
+                .thenReturn(categoryDTO(savedCategory.getId(), savedCategory.getName(), savedCategory.getDescription()));
 
         var json = new ObjectMapper().writeValueAsString(categoryDTO);
 
@@ -65,8 +75,9 @@ public class CategoryControllerV1Test {
 
     }
 
-    private CategoryDTO categoryDTO(String name, String description) {
+    private CategoryDTO categoryDTO(Long id, String name, String description) {
         return CategoryDTO.builder()
+                .id(id)
                 .name(name)
                 .description(description)
                 .build();
