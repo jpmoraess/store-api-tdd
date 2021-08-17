@@ -1,13 +1,18 @@
 package br.com.moraesit.storeapitdd.api.v1.controllers;
 
 import br.com.moraesit.storeapitdd.api.v1.dto.CategoryDTO;
+import br.com.moraesit.storeapitdd.domain.entities.Category;
+import br.com.moraesit.storeapitdd.domain.services.CategoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -29,10 +34,17 @@ public class CategoryControllerV1Test {
     @Autowired
     MockMvc mockMvc;
 
+    @MockBean
+    CategoryService categoryService;
+
     @Test
     @DisplayName("must create a create category successfully")
     public void createCategoryTest() throws Exception {
         var categoryDTO = categoryDTO("T-shirt", "Description");
+
+        var savedCategory = category(1L, "T-shirt", "Description");
+
+        BDDMockito.given(categoryService.create(Mockito.any(Category.class))).willReturn(savedCategory);
 
         var json = new ObjectMapper().writeValueAsString(categoryDTO);
 
@@ -55,6 +67,14 @@ public class CategoryControllerV1Test {
 
     private CategoryDTO categoryDTO(String name, String description) {
         return CategoryDTO.builder()
+                .name(name)
+                .description(description)
+                .build();
+    }
+
+    private Category category(Long id, String name, String description) {
+        return Category.builder()
+                .id(id)
                 .name(name)
                 .description(description)
                 .build();
