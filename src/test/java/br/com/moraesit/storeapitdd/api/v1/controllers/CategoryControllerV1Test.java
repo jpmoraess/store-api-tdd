@@ -1,5 +1,6 @@
 package br.com.moraesit.storeapitdd.api.v1.controllers;
 
+import br.com.moraesit.storeapitdd.api.v1.dto.CategoryDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,9 @@ public class CategoryControllerV1Test {
     @Test
     @DisplayName("must create a create category successfully")
     public void createCategoryTest() throws Exception {
-        var json = new ObjectMapper().writeValueAsString(null);
+        var categoryDTO = categoryDTO("T-shirt", "Description");
+
+        var json = new ObjectMapper().writeValueAsString(categoryDTO);
 
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post(CATEGORY_V1)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -48,6 +51,13 @@ public class CategoryControllerV1Test {
     @DisplayName("must validate the creation of a category with invalid data")
     public void createInvalidCategoryTest() {
 
+    }
+
+    private CategoryDTO categoryDTO(String name, String description) {
+        return CategoryDTO.builder()
+                .name(name)
+                .description(description)
+                .build();
     }
 }
 
