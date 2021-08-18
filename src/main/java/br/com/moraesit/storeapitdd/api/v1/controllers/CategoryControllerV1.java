@@ -6,6 +6,7 @@ import br.com.moraesit.storeapitdd.domain.entities.Category;
 import br.com.moraesit.storeapitdd.domain.services.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +25,7 @@ public class CategoryControllerV1 {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryDTO> create(@RequestBody CategoryDTO categoryDTO) {
+    public ResponseEntity<CategoryDTO> create(@RequestBody @Validated CategoryDTO categoryDTO) {
         Category category = categoryMapper.toEntity(categoryDTO);
         category = categoryService.create(category);
         return ResponseEntity.status(HttpStatus.CREATED)

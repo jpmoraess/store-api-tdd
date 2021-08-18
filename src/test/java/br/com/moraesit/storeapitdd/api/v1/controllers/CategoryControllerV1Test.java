@@ -71,8 +71,19 @@ public class CategoryControllerV1Test {
 
     @Test
     @DisplayName("must validate the creation of a category with invalid data")
-    public void createInvalidCategoryTest() {
+    public void createInvalidCategoryTest() throws Exception {
+        var json = new ObjectMapper().writeValueAsString(new CategoryDTO());
 
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post(CATEGORY_V1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message").isNotEmpty())
+                .andExpect(jsonPath("data").isNotEmpty())
+                .andExpect(jsonPath("status").value(400));
     }
 
     private CategoryDTO categoryDTO(Long id, String name, String description) {
