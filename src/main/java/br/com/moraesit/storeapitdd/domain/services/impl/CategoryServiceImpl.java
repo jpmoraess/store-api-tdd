@@ -1,6 +1,7 @@
 package br.com.moraesit.storeapitdd.domain.services.impl;
 
 import br.com.moraesit.storeapitdd.domain.entities.Category;
+import br.com.moraesit.storeapitdd.domain.exceptions.DomainException;
 import br.com.moraesit.storeapitdd.domain.repositories.CategoryRepository;
 import br.com.moraesit.storeapitdd.domain.services.CategoryService;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category create(Category category) {
+        if (categoryRepository.existsByName(category.getName()))
+            throw new DomainException("Name already exists");
         return categoryRepository.save(category);
     }
 }
