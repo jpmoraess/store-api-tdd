@@ -22,6 +22,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Optional;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -94,6 +96,9 @@ public class CategoryControllerV1Test {
 
         var json = new ObjectMapper().writeValueAsString(categoryDTO);
 
+        BDDMockito.when(categoryMapper.toEntity(Mockito.any(CategoryDTO.class)))
+                .thenReturn(category(null, categoryDTO.getName(), categoryDTO.getDescription()));
+
         BDDMockito.given(categoryService.create(Mockito.any(Category.class)))
                 .willThrow(new DomainException("Name already exists"));
 
@@ -106,6 +111,30 @@ public class CategoryControllerV1Test {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").value("Name already exists"))
                 .andExpect(jsonPath("status").value(400));
+    }
+
+    @Test
+    @DisplayName("")
+    public void getCategoryDetailsTest() throws Exception {
+        Long id = 1L;
+
+        Category category = category(id, "T-shirt", "T-shirt description");
+
+        BDDMockito.given(categoryService.getById(id)).willReturn(category);
+
+        CategoryDTO dto = categoryDTO(id, category.getName(), category.getDescription());
+
+        BDDMockito.when(categoryMapper.toDTO(Mockito.any(Category.class)))
+                .thenReturn(dto);
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get(CATEGORY_V1.concat("/" + id))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(id))
+                .andExpect(jsonPath("name").value("T-shirt"))
+                .andExpect(jsonPath("description").value("T-shirt description"));
     }
 
     private CategoryDTO categoryDTO(Long id, String name, String description) {

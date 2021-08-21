@@ -7,10 +7,7 @@ import br.com.moraesit.storeapitdd.domain.services.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/categories")
@@ -22,6 +19,11 @@ public class CategoryControllerV1 {
     public CategoryControllerV1(CategoryMapper categoryMapper, CategoryService categoryService) {
         this.categoryMapper = categoryMapper;
         this.categoryService = categoryService;
+    }
+
+    @GetMapping("/{id}")
+    public CategoryDTO getById(@PathVariable Long id) {
+        return categoryMapper.toDTO(categoryService.getById(id));
     }
 
     @PostMapping

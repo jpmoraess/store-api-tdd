@@ -21,4 +21,9 @@ public class CategoryServiceImpl implements CategoryService {
             throw new DomainException("Name already exists");
         return categoryRepository.save(category);
     }
+
+    @Override
+    public Category getById(Long id) {
+        return null;
+    }
 }
