@@ -10,6 +10,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(SpringExtension.class)
@@ -48,5 +50,20 @@ public class CategoryRepositoryTest {
         Boolean exists = categoryRepository.existsByName(name);
 
         assertThat(exists).isFalse();
+    }
+
+    @Test
+    @DisplayName("must return category by id")
+    public void returnCategoryByIdTest() {
+        Category category = Category.builder()
+                .name("T-shirt")
+                .description("T-shirt")
+                .build();
+
+        entityManager.persist(category);
+
+        Optional<Category> categoryOptional = categoryRepository.findById(category.getId());
+
+        assertThat(categoryOptional.isPresent()).isTrue();
     }
 }
