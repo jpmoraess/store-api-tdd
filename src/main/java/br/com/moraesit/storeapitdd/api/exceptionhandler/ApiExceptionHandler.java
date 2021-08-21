@@ -1,5 +1,6 @@
 package br.com.moraesit.storeapitdd.api.exceptionhandler;
 
+import br.com.moraesit.storeapitdd.domain.exceptions.DomainException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -26,6 +27,16 @@ public class ApiExceptionHandler {
                         .data(LocalDateTime.now())
                         .message(ex.getMessage())
                         .fieldErrors(fieldErrors)
+                        .build());
+    }
+
+    @ExceptionHandler(DomainException.class)
+    public ResponseEntity<ApiError> handleDomainException(DomainException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiError.builder()
+                        .status(400)
+                        .data(LocalDateTime.now())
+                        .message(ex.getMessage())
                         .build());
     }
 }

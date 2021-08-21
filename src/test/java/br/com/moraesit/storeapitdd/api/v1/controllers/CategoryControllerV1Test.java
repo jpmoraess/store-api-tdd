@@ -3,6 +3,7 @@ package br.com.moraesit.storeapitdd.api.v1.controllers;
 import br.com.moraesit.storeapitdd.api.v1.dto.CategoryDTO;
 import br.com.moraesit.storeapitdd.api.v1.mapper.CategoryMapper;
 import br.com.moraesit.storeapitdd.domain.entities.Category;
+import br.com.moraesit.storeapitdd.domain.exceptions.DomainException;
 import br.com.moraesit.storeapitdd.domain.services.CategoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -83,6 +84,27 @@ public class CategoryControllerV1Test {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").isNotEmpty())
                 .andExpect(jsonPath("data").isNotEmpty())
+                .andExpect(jsonPath("status").value(400));
+    }
+
+    @Test
+    @DisplayName("must validate the creation of a category with duplicated name")
+    public void createCategoryWithDuplicatedName() throws Exception {
+        var categoryDTO = categoryDTO(1L, "T-shirt", "Description");
+
+        var json = new ObjectMapper().writeValueAsString(categoryDTO);
+
+        BDDMockito.given(categoryService.create(Mockito.any(Category.class)))
+                .willThrow(new DomainException("Name already exists"));
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post(CATEGORY_V1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message").value("Name already exists"))
                 .andExpect(jsonPath("status").value(400));
     }
 
