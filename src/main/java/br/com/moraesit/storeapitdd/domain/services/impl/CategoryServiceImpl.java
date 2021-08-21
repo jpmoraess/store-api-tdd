@@ -6,6 +6,8 @@ import br.com.moraesit.storeapitdd.domain.repositories.CategoryRepository;
 import br.com.moraesit.storeapitdd.domain.services.CategoryService;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
@@ -24,6 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category getById(Long id) {
-        return null;
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Category not found."));
     }
 }

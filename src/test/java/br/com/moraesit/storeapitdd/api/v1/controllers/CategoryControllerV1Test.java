@@ -22,7 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.util.Optional;
+import javax.persistence.EntityNotFoundException;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -114,7 +114,7 @@ public class CategoryControllerV1Test {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("get category details test")
     public void getCategoryDetailsTest() throws Exception {
         Long id = 1L;
 
@@ -135,6 +135,23 @@ public class CategoryControllerV1Test {
                 .andExpect(jsonPath("id").value(id))
                 .andExpect(jsonPath("name").value("T-shirt"))
                 .andExpect(jsonPath("description").value("T-shirt description"));
+    }
+
+    @Test
+    @DisplayName("category not found test")
+    public void categoryNotFoundTest() throws Exception {
+        Long id = 1L;
+
+        BDDMockito.given(categoryService.getById(Mockito.anyLong()))
+                .willThrow(new EntityNotFoundException("Category not found."));
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get(CATEGORY_V1.concat("/" + id))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("status").value(404))
+                .andExpect(jsonPath("message").value("Category not found."));
     }
 
     private CategoryDTO categoryDTO(Long id, String name, String description) {

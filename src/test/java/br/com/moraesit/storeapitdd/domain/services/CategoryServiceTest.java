@@ -14,6 +14,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import javax.persistence.EntityNotFoundException;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
@@ -64,6 +67,33 @@ public class CategoryServiceTest {
                 .hasMessage("Name already exists");
 
         Mockito.verify(categoryRepository, Mockito.never()).save(category);
+    }
+
+    @Test
+    @DisplayName("get category by id")
+    public void getCategoryByIdTest() {
+        Long id = 1L;
+        Category category = createCategory();
+        category.setId(id);
+        Mockito.when(categoryRepository.findById(id)).thenReturn(Optional.of(category));
+
+        Category foundCategory = categoryService.getById(id);
+
+        assertThat(foundCategory).isNotNull();
+        assertThat(foundCategory.getId()).isEqualTo(id);
+        assertThat(foundCategory.getName()).isEqualTo(category.getName());
+    }
+
+    @Test
+    @DisplayName("get category not found test")
+    public void categoryNotFoundTest() {
+        Long id = 1L;
+
+        Throwable exception = Assertions.catchThrowable(() -> categoryService.getById(id));
+
+        assertThat(exception)
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Category not found.");
     }
 
     private Category createCategory() {
